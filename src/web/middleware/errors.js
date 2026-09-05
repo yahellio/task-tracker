@@ -1,5 +1,5 @@
 import multer from 'multer';
-import { AppError } from '../../domain/errors.js';
+import { AppError, NotFoundError } from '../../domain/errors.js';
 
 const MULTER_MESSAGES = Object.freeze({
   LIMIT_FILE_SIZE: 'Размер файла превышает допустимый лимит',
@@ -15,6 +15,10 @@ const describe = (error) => {
     return { status: error.status, message: error.message };
   }
   return { status: 500, message: 'Внутренняя ошибка сервера' };
+};
+
+export const notFoundHandler = () => (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 };
 
 export const errorHandler = ({ logger = console }) =>

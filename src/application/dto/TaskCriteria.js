@@ -5,7 +5,7 @@ export const StatusFilter = Object.freeze({
   OVERDUE: 'overdue'
 });
 
-export const STATUS_FILTERS = Object.freeze([StatusFilter.ALL, ...TASK_STATUSES, StatusFilter.OVERDUE]);
+const STATUS_FILTERS = Object.freeze([StatusFilter.ALL, ...TASK_STATUSES, StatusFilter.OVERDUE]);
 
 export const SortOrder = Object.freeze({
   DUE_DATE: 'dueDate',
@@ -13,7 +13,7 @@ export const SortOrder = Object.freeze({
   TITLE: 'title'
 });
 
-export const SORT_ORDERS = Object.freeze(Object.values(SortOrder));
+const SORT_ORDERS = Object.freeze(Object.values(SortOrder));
 
 export class TaskCriteria {
   #status;
@@ -48,6 +48,10 @@ export class TaskCriteria {
 
   get sort() {
     return this.#sort;
+  }
+
+  with(overrides) {
+    return new TaskCriteria({ status: this.#status, search: this.#search, sort: this.#sort, ...overrides });
   }
 
   get isDefault() {

@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { NotFoundError } from '../../domain/errors.js';
-import { FileStorage } from '../../domain/task/FileStorage.js';
+import { FileStorage } from '../../domain/ports.js';
 
 const STORAGE_KEY_PATTERN = /^[A-Za-z0-9-]+(\.[a-z0-9]{1,10})?$/;
 const EXTENSION_PATTERN = /^\.[A-Za-z0-9]{1,10}$/;

@@ -1,6 +1,6 @@
 import { StatusFilter, SortOrder } from '../../application/dto/TaskCriteria.js';
 import { Task } from '../../domain/task/Task.js';
-import { TaskRepository } from '../../domain/task/TaskRepository.js';
+import { TaskRepository } from '../../domain/ports.js';
 import { TASK_STATUSES } from '../../domain/task/TaskStatus.js';
 
 const byDueDate = (left, right) => {

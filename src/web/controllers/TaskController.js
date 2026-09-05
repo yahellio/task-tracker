@@ -2,9 +2,8 @@ import { TaskCriteria } from '../../application/dto/TaskCriteria.js';
 import { TaskForm } from '../../application/dto/TaskForm.js';
 import { NotFoundError, ValidationError } from '../../domain/errors.js';
 import { takeUploads } from '../middleware/uploads.js';
-import { FilterPresenter } from '../presenters/FilterPresenter.js';
-import { TaskPresenter } from '../presenters/TaskPresenter.js';
-import { safeRedirectTarget } from '../support/redirect.js';
+import { FilterPresenter, TaskPresenter } from '../presenters/index.js';
+import { safeRedirectTarget } from '../support/http.js';
 
 const TASKS_PATH = '/tasks';
 

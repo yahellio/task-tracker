@@ -1,8 +1,7 @@
 import express from 'express';
-import { errorHandler } from './middleware/errorHandler.js';
-import { notFoundHandler } from './middleware/notFoundHandler.js';
+import { errorHandler, notFoundHandler } from './middleware/errors.js';
 import { ATTACHMENTS_FIELD } from './middleware/uploads.js';
-import { createRouter } from './routes/index.js';
+import { createRouter } from './routes.js';
 
 export const createApp = ({ config, taskController, uploadMiddleware, logger = console }) => {
   const app = express();

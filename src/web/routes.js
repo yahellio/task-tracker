@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { asyncHandler } from '../middleware/asyncHandler.js';
+import { asyncHandler } from './support/http.js';
 
-export const createTaskRoutes = ({ taskController, uploadMiddleware }) => {
+const createTaskRoutes = ({ taskController, uploadMiddleware }) => {
   const router = Router();
 
   router.get('/', asyncHandler(taskController.index));
@@ -15,6 +15,15 @@ export const createTaskRoutes = ({ taskController, uploadMiddleware }) => {
   router.post('/:id/attachments', uploadMiddleware, asyncHandler(taskController.addAttachments));
   router.get('/:id/attachments/:attachmentId', asyncHandler(taskController.downloadAttachment));
   router.post('/:id/attachments/:attachmentId/delete', asyncHandler(taskController.removeAttachment));
+
+  return router;
+};
+
+export const createRouter = (dependencies) => {
+  const router = Router();
+
+  router.get('/', (req, res) => res.redirect('/tasks'));
+  router.use('/tasks', createTaskRoutes(dependencies));
 
   return router;
 };

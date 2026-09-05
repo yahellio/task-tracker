@@ -38,10 +38,10 @@ src/
 
 | Слой | Ответственность |
 | --- | --- |
-| `domain` | `Task` с инвариантами и поведением, объекты-значения `DueDate`, `Attachment`, перечисление `TaskStatus`, порты `TaskRepository`, `FileStorage`, `IdGenerator` |
+| `domain` | `Task` с инвариантами и поведением, объекты-значения `DueDate`, `Attachment`, перечисление `TaskStatus`, порты `TaskRepository`, `FileStorage`, `IdGenerator` в `ports.js` |
 | `application` | `TaskService` — сценарии над задачами и вложениями; `TaskForm` — разбор и валидация формы; `TaskCriteria` — параметры фильтрации |
 | `infrastructure` | `JsonFileStore` (атомарная запись, последовательная очередь операций), `JsonTaskRepository`, `LocalFileStorage`, `UuidIdGenerator` |
-| `web` | `createApp`, маршруты, `TaskController`, обработчики ошибок и загрузок, презентеры и шаблоны |
+| `web` | `createApp`, `routes.js`, `TaskController`, middleware загрузок и ошибок, презентеры и шаблоны |
 
 Разметка собрана из переиспользуемых частей: `partials/head.ejs` и `partials/foot.ejs` задают каркас страницы, `partials/sidebar.ejs` — панель фильтров, `partials/task-card.ejs` — карточку задачи в списке, `partials/task-form.ejs` — общую форму создания и редактирования.
 
