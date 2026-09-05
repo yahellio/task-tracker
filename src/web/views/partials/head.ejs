@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= pageTitle %> · <%= appName %></title>
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
+    <link rel="stylesheet" href="/css/components/button.css" />
+    <link rel="stylesheet" href="/css/components/form.css" />
+    <link rel="stylesheet" href="/css/components/filters.css" />
+    <link rel="stylesheet" href="/css/components/task.css" />
+    <link rel="stylesheet" href="/css/components/attachment.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="topbar__brand" href="/tasks"><%= appName %></a>
+      <a class="button button--primary" href="/tasks/new">Новая задача</a>
+    </header>
+    <main class="shell">

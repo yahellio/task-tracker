@@ -1,0 +1,92 @@
+<%- include('../../partials/head') %>
+
+<div class="stack">
+  <p class="backlink"><a class="backlink" href="<%= returnTo %>">← К списку задач</a></p>
+
+  <article class="card detail detail--<%= task.statusModifier %>">
+    <header class="detail__header">
+      <h1 class="detail__title"><%= task.title %></h1>
+      <span class="badge badge--<%= task.statusModifier %>"><%= task.statusLabel %></span>
+      <% if (task.isOverdue) { %><span class="badge badge--overdue">Просрочена</span><% } %>
+    </header>
+
+    <dl class="detail__facts">
+      <div class="detail__fact<%= task.isOverdue ? ' detail__fact--overdue' : '' %>">
+        <dt>Ожидаемое завершение</dt>
+        <dd><%= task.dueDateLabel %></dd>
+      </div>
+      <div class="detail__fact">
+        <dt>Создана</dt>
+        <dd><%= task.createdAtLabel %></dd>
+      </div>
+      <div class="detail__fact">
+        <dt>Обновлена</dt>
+        <dd><%= task.updatedAtLabel %></dd>
+      </div>
+    </dl>
+
+    <% if (task.description) { %>
+      <p class="detail__description"><%= task.description %></p>
+    <% } else { %>
+      <p class="hint">Описание не заполнено.</p>
+    <% } %>
+
+    <div class="detail__toolbar">
+      <span class="detail__toolbar-label">Статус:</span>
+      <form class="button-row" method="post" action="/tasks/<%= task.id %>/status">
+        <input type="hidden" name="returnTo" value="/tasks/<%= task.id %>" />
+        <% statusOptions.forEach((option) => { %>
+          <button
+            class="button button--small<%= option.value === task.status ? ' button--primary' : ` button--status-${option.modifier}` %>"
+            type="submit"
+            name="status"
+            value="<%= option.value %>"
+            <%= option.value === task.status ? 'disabled' : '' %>
+          ><%= option.label %></button>
+        <% }); %>
+      </form>
+      <span class="detail__toolbar-spacer"></span>
+      <a class="button button--small" href="/tasks/<%= task.id %>/edit?returnTo=<%= encodeURIComponent(returnTo) %>">Изменить</a>
+      <form class="button-row" method="post" action="/tasks/<%= task.id %>/delete">
+        <input type="hidden" name="returnTo" value="<%= returnTo %>" />
+        <button class="button button--small button--danger" type="submit">Удалить задачу</button>
+      </form>
+    </div>
+  </article>
+
+  <section class="attachments">
+    <h2 class="attachments__title">Вложения · <%= task.attachmentCount %></h2>
+
+    <% if (task.attachmentCount === 0) { %>
+      <p class="hint">Файлы ещё не прикреплены.</p>
+    <% } else { %>
+      <ul class="attachment-list">
+        <% task.attachments.forEach((attachment) => { %>
+          <li class="attachment">
+            <span class="attachment__icon"><%= attachment.extension %></span>
+            <span class="attachment__body">
+              <a class="attachment__name" href="/tasks/<%= task.id %>/attachments/<%= attachment.id %>"><%= attachment.name %></a>
+              <span class="attachment__meta"><%= attachment.sizeLabel %> · <%= attachment.uploadedAtLabel %></span>
+            </span>
+            <form class="button-row" method="post" action="/tasks/<%= task.id %>/attachments/<%= attachment.id %>/delete">
+              <button class="button button--small button--danger" type="submit">Удалить</button>
+            </form>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+
+    <form class="card upload" method="post" action="/tasks/<%= task.id %>/attachments" enctype="multipart/form-data">
+      <div class="upload__row">
+        <div class="field">
+          <label class="field__label" for="<%= uploads.field %>">Прикрепить файлы</label>
+          <input class="field__control" id="<%= uploads.field %>" name="<%= uploads.field %>" type="file" multiple required />
+        </div>
+        <button class="button button--primary" type="submit">Загрузить</button>
+      </div>
+      <p class="field__hint">До <%= uploads.maxFiles %> файлов, не более <%= uploads.maxFileSizeMb %> МБ каждый.</p>
+    </form>
+  </section>
+</div>
+
+<%- include('../../partials/foot') %>
