@@ -30,8 +30,9 @@ const request = async (url, { method = 'GET', body } = {}) => {
   }
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
-    const error = payload?.error ?? {};
-    throw new ApiError(response.status, error.message ?? `Ошибка сервера (${response.status})`, error.fields ?? {});
+    const error = payload?.error;
+    const fallback = response.status >= 500 ? 'Сервер недоступен, попробуйте позже' : `Ошибка запроса (${response.status})`;
+    throw new ApiError(response.status, error?.message ?? fallback, error?.fields ?? {});
   }
   return payload;
 };
