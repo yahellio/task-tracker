@@ -1,0 +1,19 @@
+{
+  "name": "task-tracker-server",
+  "version": "2.0.0",
+  "description": "REST API for the task tracker: Express + PostgreSQL",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/main.js",
+    "dev": "node --watch src/main.js"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^2.0.2",
+    "pg": "^8.16.3"
+  }
+}

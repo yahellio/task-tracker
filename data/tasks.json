@@ -1,0 +1,78 @@
+[
+  {
+    "id": "de026ce8-3e7b-4b95-b139-8ab8b82af482",
+    "title": "Просроченная задача",
+    "description": "Описание",
+    "status": "in_progress",
+    "dueDate": "2026-01-15",
+    "attachments": [],
+    "createdAt": "2026-09-05T06:24:56.510Z",
+    "updatedAt": "2026-09-05T09:57:23.136Z"
+  },
+  {
+    "id": "8eb74fbd-d001-46b3-962f-081f1103463d",
+    "title": "Задача без срока",
+    "description": "",
+    "status": "in_progress",
+    "dueDate": null,
+    "attachments": [],
+    "createdAt": "2026-09-05T06:24:56.515Z",
+    "updatedAt": "2026-09-05T09:56:12.423Z"
+  },
+  {
+    "id": "31305165-c30f-4d50-98d3-567b262a4292",
+    "title": "Подготовить отчёт по лабораторно",
+    "description": "Описать архитектуру",
+    "status": "in_progress",
+    "dueDate": "2026-09-12",
+    "attachments": [
+      {
+        "id": "51e9352a-67df-4e2d-9c20-795b7d621194",
+        "originalName": "отчёт по ЛР.docx",
+        "storageKey": "6d5625bc-d1da-46ff-84c5-cb5c26828a33.docx",
+        "mimeType": "application/octet-stream",
+        "size": 10,
+        "uploadedAt": "2026-09-05T06:25:58.585Z"
+      },
+      {
+        "id": "d4cab519-d9f0-4dcb-b7c0-86badf6362f3",
+        "originalName": "схема архитектуры.png",
+        "storageKey": "10e7d148-9ee8-4921-8386-21bedf734efc.png",
+        "mimeType": "image/png",
+        "size": 2048,
+        "uploadedAt": "2026-09-05T06:25:58.586Z"
+      }
+    ],
+    "createdAt": "2026-09-05T06:25:58.585Z",
+    "updatedAt": "2026-09-05T09:45:26.106Z"
+  },
+  {
+    "id": "df934da1-8df5-4013-8f08-cc7e3d96bc2b",
+    "title": "Настроить деплой",
+    "description": "",
+    "status": "todo",
+    "dueDate": "2026-09-20",
+    "attachments": [
+      {
+        "id": "806e2cae-c8df-42ca-aeea-a74e2f22bc37",
+        "originalName": "ЛР-5 гр. 351002 Яхновец В.А..pdf",
+        "storageKey": "8ffebc06-6540-4fb9-b9f5-70faf8e91bc3.pdf",
+        "mimeType": "application/pdf",
+        "size": 1111555,
+        "uploadedAt": "2026-09-05T07:03:58.559Z"
+      }
+    ],
+    "createdAt": "2026-09-05T06:25:58.596Z",
+    "updatedAt": "2026-09-05T09:44:55.274Z"
+  },
+  {
+    "id": "2b7b58fe-6f54-4030-be5a-72f10da32060",
+    "title": "Изучить документацию",
+    "description": "",
+    "status": "todo",
+    "dueDate": "2026-08-30",
+    "attachments": [],
+    "createdAt": "2026-09-05T06:25:58.600Z",
+    "updatedAt": "2026-09-05T09:44:41.844Z"
+  }
+]
