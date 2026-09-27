@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { formatDate, QUICK_ACTIONS, STATUS_META } from '../lib.js';
 import { OverdueBadge, StatusBadge } from './ui.jsx';
 
-export const TaskCard = ({ task, busy, onChangeStatus, onRemove }) => (
+export const TaskCard = ({ task, busy, showOwner, onChangeStatus, onRemove }) => (
   <li className={`task task--${STATUS_META[task.status].modifier}`}>
     <div className="task__main">
       <Link className="task__title" to={`/tasks/${task.id}`}>
@@ -15,6 +15,7 @@ export const TaskCard = ({ task, busy, onChangeStatus, onRemove }) => (
         </span>
         {task.isOverdue && <OverdueBadge />}
         {task.attachments.length > 0 && <span className="task__meta-item">Вложений: {task.attachments.length}</span>}
+        {showOwner && <span className="task__meta-item">Автор: {task.owner.email}</span>}
       </div>
     </div>
 

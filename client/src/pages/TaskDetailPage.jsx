@@ -103,6 +103,10 @@ export const TaskDetailPage = () => {
             <dd>{task.dueDate ? formatDate(task.dueDate) : 'Без срока'}</dd>
           </div>
           <div className="detail__fact">
+            <dt>Автор</dt>
+            <dd>{task.owner.email}</dd>
+          </div>
+          <div className="detail__fact">
             <dt>Создана</dt>
             <dd>{formatDateTime(task.createdAt)}</dd>
           </div>
@@ -156,9 +160,14 @@ export const TaskDetailPage = () => {
               <li key={attachment.id} className="attachment">
                 <span className="attachment__icon">{extensionOf(attachment.name)}</span>
                 <span className="attachment__body">
-                  <a className="attachment__name" href={api.attachmentUrl(task.id, attachment.id)}>
+                  <button
+                    className="attachment__name attachment__name--button"
+                    type="button"
+                    disabled={busy}
+                    onClick={() => perform(() => api.downloadAttachment(task.id, attachment.id, attachment.name))}
+                  >
                     {attachment.name}
-                  </a>
+                  </button>
                   <span className="attachment__meta">
                     {formatSize(attachment.size)} · {formatDateTime(attachment.uploadedAt)}
                   </span>

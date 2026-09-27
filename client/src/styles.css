@@ -733,3 +733,39 @@ a:hover {
   color: var(--text-muted);
   font-size: 13px;
 }
+
+.topbar__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.stack--narrow {
+  max-width: 420px;
+}
+
+.attachment__name--button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.attachment__name--button:hover:enabled {
+  color: var(--accent-text);
+  text-decoration: underline;
+}
+
+.attachment__name--button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.field__control--inline {
+  width: auto;
+  min-width: 180px;
+}

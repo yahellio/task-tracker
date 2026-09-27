@@ -16,6 +16,11 @@ services:
     build: ./server
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/task_tracker
+      APP_URL: http://localhost:8080
+      SMTP_URL: ${SMTP_URL:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@task-tracker.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin12345}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     volumes:
       - uploads:/app/uploads
     depends_on:

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { Task, TASK_STATUSES, TaskStatus } from './domain.js';
+import { TASK_STATUSES, Task, TaskStatus } from './domain.js';
 import { SortOrder, StatusFilter } from './validation.js';
 
 const DATE_OID = 1082;
@@ -17,7 +17,8 @@ export const connectDatabase = async (connectionString) => {
 
 const SELECT_TASKS = `
   SELECT
-    t.id, t.title, t.description, t.status, t.due_date, t.created_at, t.updated_at,
+    t.id, t.owner_id, t.title, t.description, t.status, t.due_date, t.created_at, t.updated_at,
+    u.email AS owner_email,
     COALESCE(
       (SELECT json_agg(json_build_object(
           'id', a.id,
@@ -31,6 +32,7 @@ const SELECT_TASKS = `
       '[]'
     ) AS attachments
   FROM tasks t
+  JOIN users u ON u.id = t.owner_id
 `;
 
 const ORDER_BY = Object.freeze({
@@ -39,13 +41,15 @@ const ORDER_BY = Object.freeze({
   [SortOrder.TITLE]: 'lower(t.title) ASC, t.created_at DESC'
 });
 
-const overdue = (todayParam) => `t.status <> '${TaskStatus.DONE}' AND t.due_date < ${todayParam}`;
+const overdue = (alias, todayParam) => `${alias}.status <> '${TaskStatus.DONE}' AND ${alias}.due_date < ${todayParam}`;
 
 const escapeLike = (value) => value.replace(/[\\%_]/g, (char) => `\\${char}`);
 
 const toTask = (row) =>
   new Task({
     id: row.id,
+    ownerId: row.owner_id,
+    ownerEmail: row.owner_email,
     title: row.title,
     description: row.description,
     status: row.status,
@@ -62,13 +66,16 @@ export class PgTaskRepository {
     this.#pool = pool;
   }
 
-  async find(criteria, today) {
+  async find(criteria, today, ownerId) {
     const where = [];
     const params = [];
     const bind = (value) => `$${params.push(value)}`;
 
+    if (ownerId !== null) {
+      where.push(`t.owner_id = ${bind(ownerId)}`);
+    }
     if (criteria.status === StatusFilter.OVERDUE) {
-      where.push(overdue(bind(today)));
+      where.push(overdue('t', bind(today)));
     } else if (criteria.status !== StatusFilter.ALL) {
       where.push(`t.status = ${bind(criteria.status)}`);
     }
@@ -87,13 +94,15 @@ export class PgTaskRepository {
     return rows.length === 0 ? null : toTask(rows[0]);
   }
 
-  async countByStatus(today) {
-    const byStatus = TASK_STATUSES.map((status) => `COUNT(*) FILTER (WHERE t.status = '${status}')::int AS "${status}"`);
+  async countByStatus(today, ownerId) {
+    const params = [today];
+    const scope = ownerId === null ? '' : `WHERE owner_id = $${params.push(ownerId)}`;
+    const byStatus = TASK_STATUSES.map((status) => `COUNT(*) FILTER (WHERE status = '${status}')::int AS "${status}"`);
     const { rows } = await this.#pool.query(
       `SELECT COUNT(*)::int AS "${StatusFilter.ALL}", ${byStatus.join(', ')},
-              COUNT(*) FILTER (WHERE ${overdue('$1')})::int AS "${StatusFilter.OVERDUE}"
-       FROM tasks t`,
-      [today]
+              COUNT(*) FILTER (WHERE ${overdue('tasks', '$1')})::int AS "${StatusFilter.OVERDUE}"
+       FROM tasks ${scope}`,
+      params
     );
     return rows[0];
   }
@@ -101,9 +110,18 @@ export class PgTaskRepository {
   async add(task) {
     const state = task.toState();
     await this.#pool.query(
-      `INSERT INTO tasks (id, title, description, status, due_date, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [state.id, state.title, state.description, state.status, state.dueDate, state.createdAt, state.updatedAt]
+      `INSERT INTO tasks (id, owner_id, title, description, status, due_date, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [
+        state.id,
+        state.ownerId,
+        state.title,
+        state.description,
+        state.status,
+        state.dueDate,
+        state.createdAt,
+        state.updatedAt
+      ]
     );
   }
 

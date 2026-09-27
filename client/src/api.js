@@ -1,6 +1,6 @@
-const BASE_URL = '/api/tasks';
+const BASE_URL = '/api';
 
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(status, message, fields = {}) {
     super(message);
     this.name = 'ApiError';
@@ -9,8 +9,23 @@ export class ApiError extends Error {
   }
 }
 
-const request = async (url, { method = 'GET', body } = {}) => {
+let token = null;
+let onUnauthorized = () => {};
+
+export const setToken = (value) => {
+  token = value;
+};
+
+export const onSessionExpired = (handler) => {
+  onUnauthorized = handler;
+};
+
+const send = async (path, { method = 'GET', body, auth = true } = {}) => {
   const init = { method, headers: {} };
+
+  if (auth && token !== null) {
+    init.headers.Authorization = `Bearer ${token}`;
+  }
   if (body instanceof FormData) {
     init.body = body;
   } else if (body !== undefined) {
@@ -20,21 +35,26 @@ const request = async (url, { method = 'GET', body } = {}) => {
 
   let response;
   try {
-    response = await fetch(url, init);
+    response = await fetch(`${BASE_URL}${path}`, init);
   } catch {
     throw new ApiError(0, 'Не удалось связаться с сервером');
   }
 
-  if (response.status === 204) {
-    return null;
+  if (response.ok) {
+    return response;
   }
-  const payload = await response.json().catch(() => null);
-  if (!response.ok) {
-    const error = payload?.error;
-    const fallback = response.status >= 500 ? 'Сервер недоступен, попробуйте позже' : `Ошибка запроса (${response.status})`;
-    throw new ApiError(response.status, error?.message ?? fallback, error?.fields ?? {});
+
+  if (response.status === 401 && auth) {
+    onUnauthorized();
   }
-  return payload;
+  const { error } = (await response.json().catch(() => null)) ?? {};
+  const fallback = response.status >= 500 ? 'Сервер недоступен, попробуйте позже' : `Ошибка запроса (${response.status})`;
+  throw new ApiError(response.status, error?.message ?? fallback, error?.fields ?? {});
+};
+
+const request = async (path, options) => {
+  const response = await send(path, options);
+  return response.status === 204 ? null : response.json();
 };
 
 const toQuery = (filters) => {
@@ -49,19 +69,44 @@ const toQuery = (filters) => {
 };
 
 export const api = {
-  list: (filters) => request(`${BASE_URL}${toQuery(filters)}`),
-  get: (id) => request(`${BASE_URL}/${id}`),
-  create: (input) => request(BASE_URL, { method: 'POST', body: input }),
-  update: (id, input) => request(`${BASE_URL}/${id}`, { method: 'PUT', body: input }),
-  changeStatus: (id, status) => request(`${BASE_URL}/${id}/status`, { method: 'PATCH', body: { status } }),
-  remove: (id) => request(`${BASE_URL}/${id}`, { method: 'DELETE' }),
+  register: (credentials) => request('/auth/register', { method: 'POST', body: credentials, auth: false }),
+  login: (credentials) => request('/auth/login', { method: 'POST', body: credentials, auth: false }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
+  me: () => request('/auth/me'),
+  requestPasswordReset: (email) => request('/auth/password-reset', { method: 'POST', body: { email }, auth: false }),
+  confirmPasswordReset: (body) => request('/auth/password-reset/confirm', { method: 'POST', body, auth: false }),
+
+  listSessions: () => request('/sessions'),
+  revokeSession: (id) => request(`/sessions/${id}`, { method: 'DELETE' }),
+  revokeOtherSessions: () => request('/sessions', { method: 'DELETE' }),
+
+  listUsers: () => request('/users'),
+  changeRole: (id, role) => request(`/users/${id}/role`, { method: 'PATCH', body: { role } }),
+
+  list: (filters) => request(`/tasks${toQuery(filters)}`),
+  get: (id) => request(`/tasks/${id}`),
+  create: (input) => request('/tasks', { method: 'POST', body: input }),
+  update: (id, input) => request(`/tasks/${id}`, { method: 'PUT', body: input }),
+  changeStatus: (id, status) => request(`/tasks/${id}/status`, { method: 'PATCH', body: { status } }),
+  remove: (id) => request(`/tasks/${id}`, { method: 'DELETE' }),
   upload: (id, files) => {
     const form = new FormData();
     for (const file of files) {
       form.append('attachments', file);
     }
-    return request(`${BASE_URL}/${id}/attachments`, { method: 'POST', body: form });
+    return request(`/tasks/${id}/attachments`, { method: 'POST', body: form });
   },
-  removeAttachment: (id, attachmentId) => request(`${BASE_URL}/${id}/attachments/${attachmentId}`, { method: 'DELETE' }),
-  attachmentUrl: (id, attachmentId) => `${BASE_URL}/${id}/attachments/${attachmentId}`
+  removeAttachment: (id, attachmentId) => request(`/tasks/${id}/attachments/${attachmentId}`, { method: 'DELETE' }),
+
+  downloadAttachment: async (id, attachmentId, name) => {
+    const response = await send(`/tasks/${id}/attachments/${attachmentId}`);
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = name;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
 };

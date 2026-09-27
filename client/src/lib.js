@@ -1,3 +1,15 @@
+export const ROLE_LABELS = Object.freeze({
+  user: 'Пользователь',
+  manager: 'Менеджер',
+  admin: 'Администратор'
+});
+
+export const ROLE_OPTIONS = Object.entries(ROLE_LABELS).map(([value, label]) => ({ value, label }));
+
+export const canManageUsers = (user) => user?.role === 'admin';
+
+export const seesAllTasks = (user) => user?.role === 'manager' || user?.role === 'admin';
+
 export const STATUS_META = Object.freeze({
   todo: { label: 'К выполнению', modifier: 'todo' },
   in_progress: { label: 'В работе', modifier: 'in-progress' },

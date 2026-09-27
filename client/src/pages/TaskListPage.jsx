@@ -3,10 +3,12 @@ import { api } from '../api.js';
 import { FilterSidebar } from '../components/FilterSidebar.jsx';
 import { TaskCard } from '../components/TaskCard.jsx';
 import { Loading, Notice } from '../components/ui.jsx';
+import { useAuth } from '../auth.jsx';
 import { useFilters, useRequest } from '../hooks.js';
-import { pluralizeTasks } from '../lib.js';
+import { pluralizeTasks, seesAllTasks } from '../lib.js';
 
 export const TaskListPage = () => {
+  const { user } = useAuth();
   const { filters, setFilters, isDefault } = useFilters();
   const { data, error, loading, reload } = useRequest(() => api.list(filters), [filters.status, filters.search, filters.sort]);
   const [busyId, setBusyId] = useState(null);
@@ -39,7 +41,7 @@ export const TaskListPage = () => {
 
       <div className="content">
         <header className="content__header">
-          <h1 className="content__title">Задачи</h1>
+          <h1 className="content__title">{seesAllTasks(user) ? 'Все задачи' : 'Мои задачи'}</h1>
           {data && <p className="content__subtitle">Найдено: {pluralizeTasks(data.items.length)}</p>}
         </header>
 
@@ -58,6 +60,7 @@ export const TaskListPage = () => {
                 key={task.id}
                 task={task}
                 busy={busyId === task.id}
+                showOwner={seesAllTasks(user)}
                 onChangeStatus={changeStatus}
                 onRemove={remove}
               />
